@@ -1,8 +1,9 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000;
+const bcrypt = require('bcrypt');
 app.use(express.json())
-    
+
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://FARIS:Nyas1811@atlascluster.2hyuslj.mongodb.net/?retryWrites=true&w=majority";
 
@@ -28,26 +29,59 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
-app.post('/register', (req, res) => {
-
-    client.db("WEEK4").collection("users").insertOne({
-        "username": req.body.username,
-        "password": req.body.password  
-     }  )
-res.send('Hello World!')
-})
-
-app.post('/login',(req, res) => {
-     console.log(req.body)
-    res.send('Login Succesful')
-})
-
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-    })
+  console.log(`Example app listening on port ${port}`)
+})
 
+/*app.patch('/profile', (req, res) => {
+  client.db("WEEK4").collection("users").updateOne({
+    "username": req.body.username
+  }, {
+    $set: {
+      "email": req.body.email,
+      "age": req.body.age,
+    },
+  }).then((result) => {
+    res.send('Profile Updated')
+  })
+})*/
+app.post('/register', (req, res) => {
+  const { username, password } = req.body;
+  console.log(username, password);
 
+  const hash = bcrypt.hashSync(password, 10);
+  client.db("WEEK4").collection("users")
+    .insertOne({"username": username, "password": hash})
+    res.send("Register Successful")
+    console.log(hash);
+})
+    
+  //client.db("WEEK4").collection("users").find({
+  //  "username":{$eq:req.body.username}  
+ // }).toArray().then (( result) =>{
+   // if (result.length > 0){
+  //    res.status(400).send('Username already exists')
+  //  } 
+  //  else {
+   //   client.db("WEEK4").collection("users").insertOne({
+   //     "username": req.body.username,
+   //     "password": req.body.password
+   //   })
+   //   res.send('Register Succesfully')
+   // }
+ // })
 
+ // client.db("WEEK4").collection("users").insertOne({
+    // "username": req.body.username,
+    // "password": req.body.password
+  // })
+  // res.send('Register Succesfully')
+// })
 
+/*app.post('/login', (req, res) => {
+  console.log(req.body)
+  res.send('Login Succesful')
+})*/
 
+//
+//})
